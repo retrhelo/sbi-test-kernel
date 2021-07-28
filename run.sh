@@ -1,0 +1,1 @@
+qemu-system-riscv64 -nographic -kernel target/riscv64imac-unknown-none-elf/debug/sbi-test-kernel

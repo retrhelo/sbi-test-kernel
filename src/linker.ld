@@ -5,7 +5,7 @@ ENTRY(_entry)
 	OpenSBI use 0x8020_0000 as the entry address, but in 
 	PascSBI it's something different.
 */
-BASE_ADDRESS = 0x80020000;
+BASE_ADDRESS = 0x80200000;
 
 SECTIONS {
 	. = BASE_ADDRESS;
