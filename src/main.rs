@@ -4,6 +4,7 @@
 #![feature(asm)]
 #![feature(default_alloc_error_handler)]
 #![feature(naked_functions)]
+#![feature(fn_align)]
 
 extern crate alloc;
 
@@ -16,11 +17,13 @@ mod sbi;		// interface for SBI
 mod base;		// tests for Base Extension
 mod legacy;		// tests for Legacy Extensions
 
+mod trap;		// trap handler
+
 use core::panic::PanicInfo;
 #[panic_handler]
 #[allow(dead_code)]
 fn panic(info: &PanicInfo) ->! {
-	println!("\033[31;1m[panic]\033[0m: {}", info);
+	println!("\x33[31;1m[panic]\x33[0m: {}", info);
 	loop {}
 }
 
@@ -52,17 +55,34 @@ unsafe extern "C" fn _entry(_hartid: usize, _dtb: usize) ->! {
 
 #[no_mangle]
 #[link_section = ".text"]
-extern "C" fn rust_main(hartid: usize, _dtb: usize) ->! {	
-	if 0 == hartid {	// only use hart0 as there 
+extern "C" fn rust_main(hartid: usize, _dtb: usize) ->! {		
+	if 0 == hartid {
 		// init heap and console
 		heap::init();
 		console::init();
+		trap::init();
 
-		println!("hartid {}: hello world", hartid);
-		base::run_tests();
+		let mask: u32 = 1 << 1;
+		sbi::sbi_send_ipi(&mask).unwrap();
+	}
+	else {
+		trap::init();
 	}
 
-	sbi::sbi_shutdown().unwrap();
+	println!("hello hartid {}", hartid);
+
+	if 0 == hartid {
+		let mask: u32 = 1 << 1;
+		sbi::sbi_send_ipi(&mask).unwrap();
+	}
+	legacy::run_tests(hartid);
+
+	// endless loop 
+	loop {
+		unsafe {
+			riscv::asm::wfi();
+		}
+	}
 
 	unreachable!("unreachable codes!");
 }

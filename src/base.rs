@@ -36,7 +36,7 @@ fn test_get_spec_version() {
 
 fn test_get_impl_id() {
 	let id = sbi_get_impl_id().unwrap();
-	println!("SBI Implementation: {}", id);
+	println!("SBI Implementation: {:#x}", id as usize);
 }
 
 fn test_get_impl_version() {
@@ -48,15 +48,15 @@ fn test_get_impl_version() {
 
 fn test_get_mvendorid() {
 	let mvendor = sbi_get_mvendorid().unwrap();
-	println!("mvendorid: {}", mvendor);
+	println!("mvendorid: {:#x}", mvendor as usize);
 }
 
 fn test_get_marchid() {
 	let marchid = sbi_get_marchid().unwrap();
-	println!("marchid: {}", marchid);
+	println!("marchid: {:#x}", marchid as usize);
 }
 
 fn test_get_mimpid() {
 	let mimpid = sbi_get_mimpid().unwrap();
-	println!("mimpid: {}", mimpid);
+	println!("mimpid: {:#x}", mimpid as usize);
 }
